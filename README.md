@@ -1,75 +1,87 @@
-# React + TypeScript + Vite
+# Docite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Multi-tenant Document QA SaaS** — Organizations upload PDFs; users ask questions; the AI answers only from that organization's documents and cites file name + page. One organization never sees another's data.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Repository Structure
 
-## React Compiler
+| Folder | Purpose |
+|--------|---------|
+| `apps/web/` | Vite + React + TS + Tailwind v4 SPA |
+| `apps/api/` | FastAPI backend (HTTP, business logic, DB) |
+| `ai/` | Pure Python RAG core (`docite_ai` package) |
+| `evals/` | Offline quality evaluation (golden datasets, metrics) |
+| `notebooks/` | Experiments — strip outputs before commit |
+| `data/samples/` | Synthetic PDFs for dev/testing only |
+| `scripts/` | Dev helpers (seeding, etc.) |
+| `infra/` | docker-compose.yml (pgvector db) |
+| `docs/` | Architecture, decisions, API contract, runbook |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Quick Start (PowerShell)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+### 1 — Database
+```powershell
+cd infra
+docker compose up db -d
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+### 2 — API backend
+```powershell
+cd apps/api
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -e . -e ../../ai
+Copy-Item .env.example .env   # then edit SECRET_KEY etc.
+uvicorn app.main:app --reload
+# Open http://localhost:8000/docs
 ```
+
+### 3 — Frontend
+```powershell
+cd apps/web
+npm install
+npm run dev
+# Open http://localhost:5173
+```
+
+### 4 — Tests
+```powershell
+# API tests (from apps/api with venv active)
+pytest -v
+
+# AI tests (from ai with venv active)
+cd ai; pytest -v
+
+# Frontend
+cd apps/web; npm run lint; npx tsc --noEmit; npm run build
+
+# Evaluations
+cd evals; python run_eval.py
+```
+
+### 5 — Lint
+```powershell
+# Python (run from apps/api or ai)
+ruff check .
+ruff check --fix .   # auto-fix
+
+# TypeScript
+cd apps/web; npm run lint
+```
+
+---
+
+## Architecture
+
+See [`docs/architecture.md`](docs/architecture.md) for Mermaid diagrams of the ingestion and query pipelines.
+
+## Decisions
+
+See [`docs/DECISIONS.md`](docs/DECISIONS.md) for all architectural defaults and their rationale.
+
+## Tenancy & Privacy
+
+See [`docs/tenancy-and-privacy.md`](docs/tenancy-and-privacy.md) for the data isolation rules and required security tests.
