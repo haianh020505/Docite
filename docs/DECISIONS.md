@@ -17,4 +17,4 @@ One decision per line. Swap any default by updating this file and the relevant c
 | LLM | gpt-4o-mini | Low latency, low cost for Q&A; swappable via `AI_CONFIG.generation_model` |
 | Prompt language | Vietnamese | Target user base; prompts versioned as `.md` files in `ai/src/docite_ai/prompts/` |
 | No-source threshold | 0.35 cosine similarity | Conservative default; tune via evaluation in `evals/` |
-| Container runtime | Docker Compose | Simple local dev; db-first compose order; API/web services commented for later |
+| Container runtime | None (native PostgreSQL) | Ch\u1ea1y PostgreSQL tr\u1ef1c ti\u1ebfp tr\u00ean m\u00e1y; lo\u1ea1i b\u1ecf ph\u1ee5 thu\u1ed9c Docker |

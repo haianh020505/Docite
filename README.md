@@ -15,17 +15,22 @@
 | `notebooks/` | Experiments — strip outputs before commit |
 | `data/samples/` | Synthetic PDFs for dev/testing only |
 | `scripts/` | Dev helpers (seeding, etc.) |
-| `infra/` | docker-compose.yml (pgvector db) |
+| `infra/` | Cấu hình môi trường (env templates) |
 | `docs/` | Architecture, decisions, API contract, runbook |
 
 ---
 
 ## Quick Start (PowerShell)
 
-### 1 — Database
+### 1 — Database (PostgreSQL native)
+
+Cài PostgreSQL 16 + pgvector trên máy, sau đó:
 ```powershell
-cd infra
-docker compose up db -d
+# Tạo database (chạy trong psql hoặc pgAdmin)
+# CREATE USER docite WITH PASSWORD 'docite';
+# CREATE DATABASE docite OWNER docite;
+# \c docite
+# CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
 ### 2 — API backend

@@ -2,11 +2,14 @@
 
 ## Starting Services (Local Dev)
 
-### 1. Database
+### 1. Database (PostgreSQL native)
+
+Đảm bảo PostgreSQL 16 đang chạy và database `docite` đã được tạo.
+Xem hướng dẫn chi tiết: [`infra/README.md`](../infra/README.md)
+
 ```powershell
-cd infra
-docker compose up db -d
-docker compose ps   # wait for db to be healthy
+# Kiểm tra PostgreSQL đang chạy (Windows Services)
+Get-Service -Name postgresql*
 ```
 
 ### 2. API Backend
@@ -61,6 +64,6 @@ alembic downgrade -1
 
 | Issue | Fix |
 |-------|-----|
-| `asyncpg` can't connect | Ensure `docker compose up db -d` is running |
+| `asyncpg` can't connect | Kiểm tra PostgreSQL Service đang chạy; đúng `DATABASE_URL` trong `.env` |
 | `ruff` errors in CI | Run `ruff check --fix .` locally first |
 | Build warning about `__dirname` | Use `import.meta.dirname` (already fixed in `vite.config.ts`) |
